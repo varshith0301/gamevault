@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GameVault – Reviews & Ratings</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0b0d13;
+      --surface:  #13161f;
+      --card:     #1a1e2e;
+      --border:   #252a3a;
+      --accent:   #7c3aed;
+      --glow:     #a855f7;
+      --green:    #22c55e;
+      --yellow:   #eab308;
+      --red:      #ef4444;
+      --text:     #e2e8f0;
+      --muted:    #64748b;
+      --display:  'Orbitron', sans-serif;
+      --body:     'Inter', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--body);
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(11,13,19,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 2rem; height: 64px;
+    }
+    .nav-logo {
+      font-family: var(--display);
+      font-size: 1.25rem; letter-spacing: 0.08em;
+      color: var(--glow);
+      text-shadow: 0 0 18px var(--glow);
+    }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: .9rem; font-weight: 500; transition: color .2s; }
+    .nav-links a:hover { color: var(--text); }
+
+    /* ── HERO ── */
+    .hero {
+      text-align: center;
+      padding: 7rem 1.5rem 5rem;
+      background:
+        radial-gradient(ellipse 70% 50% at 50% 0%, rgba(124,58,237,.18) 0%, transparent 70%),
+        var(--bg);
+    }
+    .hero-eyebrow {
+      display: inline-block; margin-bottom: 1.2rem;
+      font-size: .75rem; letter-spacing: .18em; text-transform: uppercase;
+      color: var(--glow); font-weight: 600;
+    }
+    .hero h1 {
+      font-family: var(--display);
+      font-size: clamp(2.4rem, 6vw, 4.5rem);
+      font-weight: 900; line-height: 1.08;
+      letter-spacing: .04em;
+      background: linear-gradient(135deg, #fff 30%, var(--glow));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin-bottom: 1.2rem;
+    }
+    .hero p {
+      max-width: 520px; margin: 0 auto 2.4rem;
+      color: var(--muted); font-size: 1.05rem;
+    }
+    .hero-cta {
+      display: inline-block;
+      padding: .85rem 2.2rem;
+      background: var(--accent); color: #fff;
+      border-radius: 8px; font-weight: 600; font-size: .95rem;
+      text-decoration: none; letter-spacing: .03em;
+      box-shadow: 0 0 28px rgba(124,58,237,.5);
+      transition: box-shadow .25s, transform .2s;
+    }
+    .hero-cta:hover { box-shadow: 0 0 42px rgba(168,85,247,.75); transform: translateY(-2px); }
+
+    /* ── SECTION WRAPPER ── */
+    section { padding: 4.5rem 1.5rem; max-width: 1100px; margin: 0 auto; }
+    .section-label {
+      font-size: .72rem; letter-spacing: .2em; text-transform: uppercase;
+      color: var(--glow); font-weight: 600; margin-bottom: .6rem;
+    }
+    .section-title {
+      font-family: var(--display);
+      font-size: clamp(1.5rem, 3vw, 2.2rem);
+      font-weight: 700; letter-spacing: .04em;
+      color: var(--text); margin-bottom: 2.8rem;
+    }
+
+    /* ── SEARCH ── */
+    .search-wrap {
+      display: flex; gap: .75rem; margin-bottom: 2.5rem;
+    }
+    .search-wrap input {
+      flex: 1; padding: .75rem 1.1rem;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text); font-size: .95rem;
+      outline: none; transition: border-color .2s;
+    }
+    .search-wrap input::placeholder { color: var(--muted); }
+    .search-wrap input:focus { border-color: var(--accent); }
+    .search-wrap button {
+      padding: .75rem 1.5rem;
+      background: var(--accent); color: #fff; border: none;
+      border-radius: 8px; font-size: .9rem; font-weight: 600;
+      cursor: pointer; transition: opacity .2s;
+    }
+    .search-wrap button:hover { opacity: .85; }
+
+    /* ── FILTER TABS ── */
+    .filter-tabs { display: flex; gap: .6rem; flex-wrap: wrap; margin-bottom: 2rem; }
+    .tab {
+      padding: .45rem 1.1rem;
+      border: 1px solid var(--border);
+      background: var(--card); color: var(--muted);
+      border-radius: 100px; font-size: .82rem; font-weight: 500;
+      cursor: pointer; transition: all .2s;
+    }
+    .tab:hover, .tab.active { border-color: var(--accent); color: var(--glow); background: rgba(124,58,237,.12); }
+
+    /* ── PRODUCT GRID ── */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+    .product-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; overflow: hidden;
+      transition: transform .25s, border-color .25s, box-shadow .25s;
+      display: flex; flex-direction: column;
+    }
+    .product-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent);
+      box-shadow: 0 8px 32px rgba(124,58,237,.2);
+    }
+    .product-img {
+      width: 100%; height: 190px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 4.5rem; background: var(--surface);
+    }
+    .product-body { padding: 1.3rem; flex: 1; display: flex; flex-direction: column; gap: .5rem; }
+    .product-category {
+      font-size: .7rem; letter-spacing: .15em; text-transform: uppercase;
+      color: var(--glow); font-weight: 600;
+    }
+    .product-name {
+      font-family: var(--display);
+      font-size: 1rem; font-weight: 700; letter-spacing: .03em; color: var(--text);
+    }
+    .product-desc { font-size: .85rem; color: var(--muted); flex: 1; }
+
+    .stars { display: flex; align-items: center; gap: .35rem; margin-top: .4rem; }
+    .star-icons { color: var(--yellow); font-size: .95rem; letter-spacing: .05rem; }
+    .rating-num { font-size: .85rem; font-weight: 600; color: var(--text); }
+    .review-count { font-size: .78rem; color: var(--muted); }
+
+    .price-row { display: flex; align-items: center; justify-content: space-between; margin-top: .8rem; }
+    .price { font-size: 1.2rem; font-weight: 700; color: var(--text); }
+    .badge {
+      font-size: .7rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+      padding: .25rem .65rem; border-radius: 100px;
+    }
+    .badge-green  { background: rgba(34,197,94,.15);  color: var(--green); }
+    .badge-yellow { background: rgba(234,179,8,.15);  color: var(--yellow); }
+    .badge-red    { background: rgba(239,68,68,.15);  color: var(--red); }
+
+    .btn-review {
+      width: 100%; margin-top: 1rem; padding: .65rem;
+      background: transparent; border: 1px solid var(--border);
+      color: var(--muted); border-radius: 8px; font-size: .85rem; font-weight: 600;
+      cursor: pointer; transition: all .2s;
+    }
+    .btn-review:hover { border-color: var(--accent); color: var(--glow); }
+
+    /* ── REVIEWS SECTION ── */
+    .reviews-list { display: flex; flex-direction: column; gap: 1.2rem; }
+    .review-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.4rem;
+    }
+    .review-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: .5rem; }
+    .reviewer { display: flex; align-items: center; gap: .75rem; }
+    .avatar {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: var(--accent); display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: .9rem; color: #fff;
+    }
+    .reviewer-name { font-weight: 600; font-size: .9rem; }
+    .review-product { font-size: .75rem; color: var(--muted); }
+    .review-date { font-size: .75rem; color: var(--muted); }
+    .review-text { font-size: .875rem; color: var(--muted); line-height: 1.65; margin-top: .6rem; }
+    .helpful { display: flex; align-items: center; gap: .5rem; margin-top: .75rem; font-size: .78rem; color: var(--muted); }
+    .helpful button {
+      background: none; border: 1px solid var(--border);
+      border-radius: 6px; padding: .2rem .65rem;
+      color: var(--muted); cursor: pointer; font-size: .78rem; transition: all .2s;
+    }
+    .helpful button:hover { border-color: var(--glow); color: var(--glow); }
+
+    /* ── MODAL ── */
+    .overlay {
+      display: none; position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,.75); backdrop-filter: blur(6px);
+      align-items: center; justify-content: center;
+    }
+    .overlay.open { display: flex; }
+    .modal {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 2rem; width: 90%; max-width: 480px;
+      position: relative;
+    }
+    .modal h3 {
+      font-family: var(--display); font-size: 1.1rem; font-weight: 700;
+      letter-spacing: .05em; margin-bottom: 1.4rem; color: var(--text);
+    }
+    .modal-close {
+      position: absolute; top: 1rem; right: 1rem;
+      background: none; border: none; color: var(--muted);
+      font-size: 1.4rem; cursor: pointer; line-height: 1;
+    }
+    .modal label { display: block; font-size: .82rem; color: var(--muted); margin-bottom: .35rem; font-weight: 500; }
+    .modal input, .modal select, .modal textarea {
+      width: 100%; padding: .65rem .9rem;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text); font-size: .9rem;
+      outline: none; font-family: var(--body); transition: border-color .2s;
+      margin-bottom: 1rem;
+    }
+    .modal input:focus, .modal select:focus, .modal textarea:focus { border-color: var(--accent); }
+    .modal textarea { resize: vertical; min-height: 90px; }
+    .star-picker { display: flex; gap: .5rem; margin-bottom: 1rem; }
+    .star-picker span { font-size: 1.6rem; cursor: pointer; opacity: .35; transition: opacity .15s, transform .15s; }
+    .star-picker span.lit { opacity: 1; }
+    .star-picker span:hover { transform: scale(1.2); }
+    .btn-submit {
+      width: 100%; padding: .8rem;
+      background: var(--accent); color: #fff; border: none;
+      border-radius: 8px; font-size: .95rem; font-weight: 700;
+      cursor: pointer; font-family: var(--body); transition: opacity .2s;
+    }
+    .btn-submit:hover { opacity: .85; }
+
+    /* ── STATS STRIP ── */
+    .stats-strip {
+      background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      display: flex; justify-content: center; flex-wrap: wrap; gap: 2.5rem;
+      padding: 2.5rem 1.5rem; text-align: center;
+    }
+    .stat-num {
+      font-family: var(--display); font-size: 2rem; font-weight: 900;
+      color: var(--glow); letter-spacing: .06em;
+    }
+    .stat-label { font-size: .78rem; color: var(--muted); text-transform: uppercase; letter-spacing: .12em; margin-top: .2rem; }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center; padding: 2.5rem 1rem;
+      font-size: .8rem; color: var(--muted);
+      border-top: 1px solid var(--border);
+    }
+    footer span { color: var(--glow); }
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: var(--accent); color: #fff; padding: .75rem 1.6rem;
+      border-radius: 100px; font-weight: 600; font-size: .88rem;
+      box-shadow: 0 4px 24px rgba(124,58,237,.5);
+      transition: transform .35s ease; z-index: 999; pointer-events: none;
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">GAME<span style="color:#fff">VAULT</span></div>
+  <ul class="nav-links">
+    <li><a href="#products">Products</a></li>
+    <li><a href="#reviews">Reviews</a></li>
+    <li><a href="#about">About</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">🎮 The Gamer's Source of Truth</div>
+  <h1>Find Your Next<br>Winning Gear</h1>
+  <p>Honest ratings and real reviews on the best gaming products — controllers, headsets, GPUs, and more.</p>
+  <a href="#products" class="hero-cta">Browse Products ↓</a>
+</div>
+
+<!-- STATS -->
+<div class="stats-strip">
+  <div><div class="stat-num">248</div><div class="stat-label">Products Reviewed</div></div>
+  <div><div class="stat-num">12K+</div><div class="stat-label">Verified Reviews</div></div>
+  <div><div class="stat-num">4.6 ★</div><div class="stat-label">Avg Rating</div></div>
+  <div><div class="stat-num">38</div><div class="stat-label">Brands Covered</div></div>
+</div>
+
+<!-- PRODUCTS -->
+<section id="products">
+  <div class="section-label">Hardware & Peripherals</div>
+  <div class="section-title">Top Rated Gaming Products</div>
+
+  <!-- Search -->
+  <div class="search-wrap">
+    <input type="text" id="searchInput" placeholder="Search products, brands…" oninput="filterProducts()"/>
+    <button onclick="filterProducts()">Search</button>
+  </div>
+
+  <!-- Filter Tabs -->
+  <div class="filter-tabs" id="filterTabs">
+    <div class="tab active" onclick="setFilter('all',this)">All</div>
+    <div class="tab" onclick="setFilter('Controller',this)">Controllers</div>
+    <div class="tab" onclick="setFilter('Headset',this)">Headsets</div>
+    <div class="tab" onclick="setFilter('GPU',this)">GPUs</div>
+    <div class="tab" onclick="setFilter('Mouse',this)">Mice</div>
+    <div class="tab" onclick="setFilter('Monitor',this)">Monitors</div>
+    <div class="tab" onclick="setFilter('Keyboard',this)">Keyboards</div>
+  </div>
+
+  <div class="product-grid" id="productGrid"></div>
+</section>
+
+<!-- REVIEWS -->
+<section id="reviews">
+  <div class="section-label">Community Voices</div>
+  <div class="section-title">Latest Reviews</div>
+  <div class="reviews-list" id="reviewsList"></div>
+</section>
+
+<!-- ABOUT -->
+<section id="about" style="max-width:680px">
+  <div class="section-label">Who We Are</div>
+  <div class="section-title">About GameVault</div>
+  <p style="color:var(--muted);line-height:1.9;font-size:.95rem">
+    GameVault is a community-driven platform where real gamers share honest opinions on the gear they use every day.
+    We don't accept paid placements — every score is earned through community ratings and verified purchases.
+    Our goal is simple: help you spend smart and play better.
+  </p>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  Built with ❤️ for gamers &nbsp;|&nbsp; <span>GameVault</span> © 2025
+</footer>
+
+<!-- REVIEW MODAL -->
+<div class="overlay" id="reviewOverlay">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h3>Write a Review</h3>
+    <label>Your Name</label>
+    <input type="text" id="rName" placeholder="e.g. Alex G."/>
+    <label>Product</label>
+    <input type="text" id="rProduct" readonly/>
+    <label>Rating</label>
+    <div class="star-picker" id="starPicker">
+      <span onclick="setStars(1)">★</span>
+      <span onclick="setStars(2)">★</span>
+      <span onclick="setStars(3)">★</span>
+      <span onclick="setStars(4)">★</span>
+      <span onclick="setStars(5)">★</span>
+    </div>
+    <label>Review</label>
+    <textarea id="rText" placeholder="Share your experience…"></textarea>
+    <button class="btn-submit" onclick="submitReview()">Submit Review</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast">✅ Review submitted — thanks!</div>
+
+<script>
+  /* ── DATA ── */
+  const products = [
+    { id:1, name:"DualSense Edge",     category:"Controller", emoji:"🎮", price:"$199", rating:4.8, reviews:1240, verdict:"Best in Class", badge:"badge-green",  desc:"Sony's pro controller with swappable sticks and back buttons. Hall-effect triggers feel incredible." },
+    { id:2, name:"SteelSeries Arctis Nova Pro", category:"Headset", emoji:"🎧", price:"$349", rating:4.7, reviews:893, verdict:"Top Pick", badge:"badge-green", desc:"Hi-Res audio, active noise cancellation, and a hot-swappable battery system for marathon sessions." },
+    { id:3, name:"RTX 4080 Super",     category:"GPU",        emoji:"🖥️", price:"$999", rating:4.6, reviews:2100, verdict:"Recommended", badge:"badge-green",  desc:"NVIDIA's powerhouse GPU. Dominates 4K gaming and DLSS 3.5 makes everything silky-smooth." },
+    { id:4, name:"Logitech G Pro X 2", category:"Mouse",      emoji:"🖱️", price:"$159", rating:4.9, reviews:3300, verdict:"Editor's Choice", badge:"badge-green", desc:"Lightweight at 60g, HERO 25K sensor, and the best click feel in the business. A pro-player favourite." },
+    { id:5, name:"LG 27GP850-B",       category:"Monitor",    emoji:"📺", price:"$329", rating:4.5, reviews:760,  verdict:"Great Value", badge:"badge-green",  desc:"1440p 165Hz Nano IPS with near-instant response. One of the sharpest mid-range gaming monitors." },
+    { id:6, name:"Xbox Elite Series 2",category:"Controller", emoji:"🎮", price:"$179", rating:4.4, reviews:980,  verdict:"Recommended", badge:"badge-green",  desc:"Adjustable tension sticks, rubberised grip, and paddles. The gold standard for Xbox fans." },
+    { id:7, name:"HyperX Cloud Alpha",  category:"Headset",    emoji:"🎧", price:"$99",  rating:4.3, reviews:5500, verdict:"Best Budget", badge:"badge-yellow", desc:"Dual-chamber drivers punch above their price tag. Comfortable enough for all-day wear." },
+    { id:8, name:"Keychron Q3 Pro",    category:"Keyboard",   emoji:"⌨️", price:"$189", rating:4.6, reviews:420,  verdict:"Recommended", badge:"badge-green",  desc:"Gasket-mounted, QMK/VIA programmable, with a satisfying thock that rivals keyboards 2× the price." },
+    { id:9, name:"RX 7600",            category:"GPU",        emoji:"🖥️", price:"$269", rating:4.1, reviews:630,  verdict:"Mid-Range",   badge:"badge-yellow", desc:"AMD's budget GPU champion. Solid 1080p performance without breaking the bank." },
+  ];
+
+  const communityReviews = [
+    { avatar:"J",  name:"JoelR",       product:"Logitech G Pro X 2",        stars:5, date:"2 days ago",  text:"Absolutely transformed my aim. The sensor is flawless — zero acceleration or smoothing. Worth every penny if you play FPS competitively.", helpful:18 },
+    { avatar:"M",  name:"Maya K.",     product:"SteelSeries Arctis Nova Pro",stars:5, date:"1 week ago", text:"The ANC is a game-changer for my apartment. Sound stage is wide enough to hear enemy footsteps from across the map in tactical shooters.", helpful:34 },
+    { avatar:"TR", name:"TechRaj",     product:"RTX 4080 Super",             stars:4, date:"3 days ago", text:"It's genuinely fast, but VRAM is already feeling tight in some newer titles at 4K with max settings. Still the best single card I've used.", helpful:22 },
+    { avatar:"S",  name:"Shruti D.",   product:"DualSense Edge",             stars:5, date:"5 days ago", text:"The haptic feedback on PC via Steam is incredible. The swappable sticks saved my controller — I replaced the worn ones in under a minute.", helpful:41 },
+    { avatar:"A",  name:"AlexV",       product:"Keychron Q3 Pro",            stars:5, date:"1 week ago", text:"Best keyboard I've ever typed on. The gasket mount absorbs every keystroke. I went with Gateron Browns and they pair perfectly.", helpful:15 },
+  ];
+
+  let userReviews = [];
+  let activeFilter = "all";
+  let chosenStars = 0;
+  let currentProduct = "";
+
+  /* ── RENDER PRODUCTS ── */
+  function renderProducts() {
+    const q = document.getElementById("searchInput").value.toLowerCase();
+    const grid = document.getElementById("productGrid");
+    const filtered = products.filter(p => {
+      const matchFilter = activeFilter === "all" || p.category === activeFilter;
+      const matchSearch = p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q);
+      return matchFilter && matchSearch;
+    });
+    grid.innerHTML = filtered.length ? filtered.map(p => `
+      <div class="product-card">
+        <div class="product-img">${p.emoji}</div>
+        <div class="product-body">
+          <div class="product-category">${p.category}</div>
+          <div class="product-name">${p.name}</div>
+          <div class="product-desc">${p.desc}</div>
+          <div class="stars">
+            <span class="star-icons">${"★".repeat(Math.round(p.rating))}${"☆".repeat(5-Math.round(p.rating))}</span>
+            <span class="rating-num">${p.rating}</span>
+            <span class="review-count">(${p.reviews.toLocaleString()} reviews)</span>
+          </div>
+          <div class="price-row">
+            <span class="price">${p.price}</span>
+            <span class="badge ${p.badge}">${p.verdict}</span>
+          </div>
+          <button class="btn-review" onclick="openModal('${p.name}')">+ Write a Review</button>
+        </div>
+      </div>
+    `).join("") : `<p style="color:var(--muted);grid-column:1/-1">No products match your search.</p>`;
+  }
+
+  /* ── RENDER REVIEWS ── */
+  function renderReviews() {
+    const list = document.getElementById("reviewsList");
+    const allReviews = [...userReviews.reverse(), ...communityReviews];
+    list.innerHTML = allReviews.map(r => `
+      <div class="review-card">
+        <div class="review-header">
+          <div class="reviewer">
+            <div class="avatar">${r.avatar}</div>
+            <div>
+              <div class="reviewer-name">${r.name}</div>
+              <div class="review-product">on ${r.product}</div>
+            </div>
+          </div>
+          <div class="review-date">${r.date}</div>
+        </div>
+        <div class="stars">
+          <span class="star-icons">${"★".repeat(r.stars)}${"☆".repeat(5-r.stars)}</span>
+        </div>
+        <div class="review-text">${r.text}</div>
+        <div class="helpful">Helpful? <button onclick="this.textContent='👍 Thanks!'">👍 Yes (${r.helpful || 0})</button></div>
+      </div>
+    `).join("");
+  }
+
+  /* ── FILTER ── */
+  function setFilter(cat, el) {
+    activeFilter = cat;
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+    el.classList.add("active");
+    renderProducts();
+  }
+  function filterProducts() { renderProducts(); }
+
+  /* ── MODAL ── */
+  function openModal(name) {
+    currentProduct = name;
+    document.getElementById("rProduct").value = name;
+    document.getElementById("rName").value = "";
+    document.getElementById("rText").value = "";
+    chosenStars = 0; updateStarPicker();
+    document.getElementById("reviewOverlay").classList.add("open");
+  }
+  function closeModal() { document.getElementById("reviewOverlay").classList.remove("open"); }
+  document.getElementById("reviewOverlay").addEventListener("click", e => { if(e.target===e.currentTarget) closeModal(); });
+
+  function setStars(n) { chosenStars = n; updateStarPicker(); }
+  function updateStarPicker() {
+    document.querySelectorAll("#starPicker span").forEach((s,i) => {
+      s.classList.toggle("lit", i < chosenStars);
+    });
+  }
+
+  function submitReview() {
+    const name = document.getElementById("rName").value.trim();
+    const text = document.getElementById("rText").value.trim();
+    if(!name || !text || !chosenStars) { alert("Please fill in all fields and pick a star rating."); return; }
+    userReviews.push({
+      avatar: name[0].toUpperCase(),
+      name, product: currentProduct,
+      stars: chosenStars, date: "Just now",
+      text, helpful: 0
+    });
+    closeModal();
+    renderReviews();
+    showToast();
+    document.getElementById("reviews").scrollIntoView({behavior:"smooth"});
+  }
+
+  function showToast() {
+    const t = document.getElementById("toast");
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 3000);
+  }
+
+  /* ── INIT ── */
+  renderProducts();
+  renderReviews();
+</script>
+</body>
+</html>
